@@ -73,6 +73,7 @@ def record_hst_data_to_mysql(hst_data_directory, database_yaml_path):
     for hst in hst_files:
         name = re.sub("\..+$", "", os.path.basename(hst)).lower()
         df = tickdata(hst)
+        df = df[:-1]
         if name not in tables:
             df.index += 1 
             df.to_sql(name, conn, index_label='id')

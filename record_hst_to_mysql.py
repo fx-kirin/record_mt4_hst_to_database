@@ -81,7 +81,7 @@ def record_hst_data_to_mysql(hst_data_directory, database_yaml_path):
             df.index += 1 
             create_statement = """
                 CREATE TABLE `%s` (
-                  `id` BIGINT(11) NOT NULL AUTO_INCREMENT,
+                  `id` BIGINT(20) NOT NULL AUTO_INCREMENT,
                   `time` datetime DEFAULT NULL,
                   `open` double DEFAULT NULL,
                   `high` double DEFAULT NULL,
@@ -93,15 +93,18 @@ def record_hst_data_to_mysql(hst_data_directory, database_yaml_path):
                 ) ENGINE=InnoDB AUTO_INCREMENT=43192 DEFAULT CHARSET=utf8;
             """%(name)
             conn.execute(create_statement)
-            df.to_sql(name, conn, index_label='id', if_exists='replace', chunksize=1000)
+            df.to_sql(name, conn, index_label='id', if_exists='append', chunksize=1000)
         else:
             Base.classes
             cl = Base.classes[name]
-            latest_date = session.query(cl.time).order_by(cl.id.desc()).first()[0]
-            new_df = df[df['time'] > latest_date]
-            new_df.to_sql(name, conn, index=False, if_exists='append', chunksize=1000)
-            del new_df
+            latest_date = session.query(cl.time).order_by(cl.id.desc()).first()
+            if latest_date:
+                latest_date = latest_date[0]
+                df = df[df['time'] > latest_date]
+            df.to_sql(name, conn, index=False, if_exists='append', chunksize=1000)
         del df
 
 if __name__ == "__main__":
+    from tendo import singleton
+    me = singleton.SingleInstance()
     fire.Fire(record_hst_data_to_mysql)

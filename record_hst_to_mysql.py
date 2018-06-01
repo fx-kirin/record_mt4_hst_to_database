@@ -34,7 +34,7 @@ def tickdata(filepath):
             dtype = [('time', 'u8'), ('open', 'f8'), ('high', 'f8'), ('low', 'f8'),
                      ('close', 'f8'), ('volume', 'i8'), ('s', 'i4'), ('r', 'i8')]
             df = pd.DataFrame(np.frombuffer(f.read(), dtype=dtype).astype(dtype[:-2]))
-        df['time'] = df['time'] - 14 * 60 * 60
+        df['time'] = df['time']
         df['time'] = pd.to_datetime(df['time'], unit='s')
     return df
 

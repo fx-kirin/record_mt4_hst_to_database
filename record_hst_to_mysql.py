@@ -71,7 +71,7 @@ def record_hst_data_to_mysql(hst_data_directory, database_yaml_path):
     hst_wild_card = os.path.join(hst_data_directory, "*.hst")
     hst_files = glob.glob(hst_wild_card)
     for hst in hst_files:
-        name = re.sub("\..+$", "", os.path.basename(hst))
+        name = re.sub("\..+$", "", os.path.basename(hst)).lower()
         df = tickdata(hst)
         if name not in tables:
             df.index += 1 
